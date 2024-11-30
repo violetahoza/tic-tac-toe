@@ -1,120 +1,76 @@
 import tkinter as tk
+from tkinter import messagebox
+from tic_tac_toe_logic import TicTacToeLogic
 
-# Initialize the game state
-board = [[' ' for _ in range(3)] for _ in range(3)]
-turn = 'X'  # Player X starts
-x_wins = 0   # Count of X wins
-o_wins = 0   # Count of O wins
-
-# Function to print the board (for debugging purposes)
-def print_board():
-    for row in board:
-        print(row)
-
-# Function to check if there is a winner
-def check_winner():
-    # Check rows
-    for row in board:
-        if row[0] == row[1] == row[2] != ' ':
-            return f"Player {row[0]} wins!"
-    
-    # Check columns
-    for col in range(3):
-        if board[0][col] == board[1][col] == board[2][col] != ' ':
-            return f"Player {board[0][col]} wins!"
-    
-    # Check diagonals
-    if board[0][0] == board[1][1] == board[2][2] != ' ':
-        return f"Player {board[0][0]} wins!"
-    if board[0][2] == board[1][1] == board[2][0] != ' ':
-        return f"Player {board[0][2]} wins!"
-    
-    # Check for a draw
-    if all(board[i][j] != ' ' for i in range(3) for j in range(3)):
-        return "It's a draw!"
-    
-    return None
-
-# Function to handle a move
-def handle_move(row, col):
-    global turn
-    
-    # Only make a move if the cell is empty
-    if board[row][col] == ' ':
-        board[row][col] = turn
-        winner = check_winner()
+class TicTacToe:
+    def __init__(self, master):
+        self.master = master
+        self.master.title("Tic Tac Toe")
         
-        if winner:
-            label.config(text=winner)
-            update_win_counts(winner)
-            disable_buttons()
-        else:
-            turn = 'O' if turn == 'X' else 'X'
-            label.config(text=f"Player {turn}'s turn")
-            update_buttons()
+        # Game state
+        self.current_player = 'X'
+        self.board = [''] * 9
+        self.logic_handler = TicTacToeLogic()
+        
+        # Create board buttons
+        self.buttons = []
+        for i in range(3):
+            for j in range(3):
+                btn = tk.Button(
+                    master, 
+                    text='', 
+                    font=('Arial', 20), 
+                    width=5, 
+                    height=2,
+                    command=lambda row=i, col=j: self.on_click(row, col)
+                )
+                btn.grid(row=i, column=j)
+                self.buttons.append(btn)
+        
+        # Reset button
+        reset_btn = tk.Button(
+            master, 
+            text="Reset Game", 
+            command=self.reset_game
+        )
+        reset_btn.grid(row=3, column=1)
 
-# Function to update the buttons with the current board state
-def update_buttons():
-    for i in range(3):
-        for j in range(3):
-            buttons[i][j].config(text=board[i][j])
+    def on_click(self, row, col):
+        # Calculate button index
+        index = row * 3 + col
+        
+        # Check if cell is empty
+        if self.board[index] == '':
+            # Place current player's mark
+            self.board[index] = self.current_player
+            self.buttons[index].config(text=self.current_player)
+            
+            # Check for win condition using Prover9
+            win = self.logic_handler.verify_win_condition(self.board, self.current_player)  # Pass current_player here
+            
+            if win:
+                messagebox.showinfo("Game Over", f"{win} wins!")
+                self.reset_game()
+            elif '' not in self.board:
+                messagebox.showinfo("Game Over", "Draw!")
+                self.reset_game()
+            else:
+                # Switch players
+                self.current_player = 'O' if self.current_player == 'X' else 'X'
 
-# Function to disable all buttons when the game ends
-def disable_buttons():
-    for i in range(3):
-        for j in range(3):
-            buttons[i][j].config(state="disabled")
+    def reset_game(self):
+        # Clear board
+        self.board = [''] * 9
+        for btn in self.buttons:
+            btn.config(text='')
 
-# Function to restart the game
-def restart_game():
-    global board, turn
-    board = [[' ' for _ in range(3)] for _ in range(3)]
-    turn = 'X'
-    label.config(text="Player X's turn")
-    update_buttons()
-    enable_buttons()
+        # Reset to X's turn
+        self.current_player = 'X'
 
-# Function to enable all buttons (used during restart)
-def enable_buttons():
-    for i in range(3):
-        for j in range(3):
-            buttons[i][j].config(state="normal")
+def main():
+    root = tk.Tk()
+    game = TicTacToe(root)
+    root.mainloop()
 
-# Function to update the win counts and the display
-def update_win_counts(winner):
-    global x_wins, o_wins
-    if "Player X" in winner:
-        x_wins += 1
-    elif "Player O" in winner:
-        o_wins += 1
-    win_count_label.config(text=f"X Wins: {x_wins} | O Wins: {o_wins}")
-
-# Tkinter UI Setup
-root = tk.Tk()
-root.title("Tic-Tac-Toe")
-
-# Create a label to display the current game status
-label = tk.Label(root, text="Player X's turn", font=("Arial", 14))
-label.grid(row=0, column=0, columnspan=3)
-
-# Create a 3x3 grid of buttons for the Tic-Tac-Toe board
-buttons = [[None for _ in range(3)] for _ in range(3)]
-for i in range(3):
-    for j in range(3):
-        buttons[i][j] = tk.Button(root, text=" ", width=10, height=3, font=("Arial", 24),
-                                  command=lambda i=i, j=j: handle_move(i, j))
-        buttons[i][j].grid(row=i+1, column=j)
-
-# Create a restart button
-reset_button = tk.Button(root, text="Restart", font=("Arial", 14), command=restart_game)
-reset_button.grid(row=4, column=0, columnspan=3)
-
-# Create a label to display the win counts
-win_count_label = tk.Label(root, text=f"X Wins: {x_wins} | O Wins: {o_wins}", font=("Arial", 12))
-win_count_label.grid(row=5, column=0, columnspan=3)
-
-# Start the game
-restart_game()
-
-# Run the Tkinter event loop
-root.mainloop()
+if __name__ == "__main__":
+    main()
