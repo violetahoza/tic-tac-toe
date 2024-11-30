@@ -1,0 +1,106 @@
+set(binary_resolution).
+set(print_gen).
+
+formulas(assumptions).
+
+    % A cell cannot be occupied by both X and O.
+    -(X1_1 & O1_1).
+    -(X1_2 & O1_2).
+    -(X1_3 & O1_3).
+    -(X2_1 & O2_1).
+    -(X2_2 & O2_2).
+    -(X2_3 & O2_3).
+    -(X3_1 & O3_1).
+    -(X3_2 & O3_2).
+    -(X3_3 & O3_3).
+
+    % Winning conditions for X.
+    % Rows
+    (X1_1 & X1_2 & X1_3) -> X_wins. % top row
+    (X2_1 & X2_2 & X2_3) -> X_wins. % middle row
+    (X3_1 & X3_2 & X3_3) -> X_wins. % bottom row
+
+    % Columns
+    (X1_1 & X2_1 & X3_1) -> X_wins. % left column
+    (X1_2 & X2_2 & X3_2) -> X_wins. % middle column
+    (X1_3 & X2_3 & X3_3) -> X_wins. % right column
+
+    % Diagonals
+    (X1_1 & X2_2 & X3_3) -> X_wins. % top-left to bottom-right diagonal
+    (X1_3 & X2_2 & X3_1) -> X_wins. % top-right to bottom-left diagonal
+
+    % Winning conditions for O.
+    % Rows
+    (O1_1 & O1_2 & O1_3) -> O_wins. % top row
+    (O2_1 & O2_2 & O2_3) -> O_wins. % middle row
+    (O3_1 & O3_2 & O3_3) -> O_wins. % bottom row
+
+    % Columns
+    (O1_1 & O2_1 & O3_1) -> O_wins. % left column
+    (O1_2 & O2_2 & O3_2) -> O_wins. % middle column
+    (O1_3 & O2_3 & O3_3) -> O_wins. % right column
+
+    % Diagonals
+    (O1_1 & O2_2 & O3_3) -> O_wins. % top-left to bottom-right diagonal
+    (O1_3 & O2_2 & O3_1) -> O_wins. % top-right to bottom-left diagonal
+
+    % At most one winner
+    -(X_wins & O_wins).
+
+    % A cell is occupied if it contains X or O.
+    Occupied_1_1 <-> (X1_1 | O1_1).
+    Occupied_1_2 <-> (X1_2 | O1_2).
+    Occupied_1_3 <-> (X1_3 | O1_3).
+    Occupied_2_1 <-> (X2_1 | O2_1).
+    Occupied_2_2 <-> (X2_2 | O2_2).
+    Occupied_2_3 <-> (X2_3 | O2_3).
+    Occupied_3_1 <-> (X3_1 | O3_1).
+    Occupied_3_2 <-> (X3_2 | O3_2).
+    Occupied_3_3 <-> (X3_3 | O3_3).
+
+    % If a cell is empty, X or O can move into it, but once occupied, it cannot be empty again.
+    Empty_1_1 <-> -(Occupied_1_1).
+    Empty_1_2 <-> -(Occupied_1_2).
+    Empty_1_3 <-> -(Occupied_1_3).
+    Empty_2_1 <-> -(Occupied_2_1).
+    Empty_2_2 <-> -(Occupied_2_2).
+    Empty_2_3 <-> -(Occupied_2_3).
+    Empty_3_1 <-> -(Occupied_3_1).
+    Empty_3_2 <-> -(Occupied_3_2).
+    Empty_3_3 <-> -(Occupied_3_3).
+
+    % If a cell is empty, it can be occupied by X or O.
+    (Empty_1_1 -> (X1_1 | O1_1)).
+    (Empty_1_2 -> (X1_2 | O1_2)).
+    (Empty_1_3 -> (X1_3 | O1_3)).
+    (Empty_2_1 -> (X2_1 | O2_1)).
+    (Empty_2_2 -> (X2_2 | O2_2)).
+    (Empty_2_3 -> (X2_3 | O2_3)).
+    (Empty_3_1 -> (X3_1 | O3_1)).
+    (Empty_3_2 -> (X3_2 | O3_2)).
+    (Empty_3_3 -> (X3_3 | O3_3)).
+
+    % Once a cell is occupied, it can no longer be empty.
+    (Occupied_1_1 -> -Empty_1_1).
+    (Occupied_1_2 -> -Empty_1_2).
+    (Occupied_1_3 -> -Empty_1_3).
+    (Occupied_2_1 -> -Empty_2_1).
+    (Occupied_2_2 -> -Empty_2_2).
+    (Occupied_2_3 -> -Empty_2_3).
+    (Occupied_3_1 -> -Empty_3_1).
+    (Occupied_3_2 -> -Empty_3_2).
+    (Occupied_3_3 -> -Empty_3_3).
+
+    % Define alternating turns for X and O using the rule that when X plays, O must play next, and vice versa.
+    % The first move is made by X, then O, then X, and so on.
+    (Turn_X -> -(Turn_O)).
+    (Turn_O -> -(Turn_X)).
+
+end_of_list.
+
+formulas(goals).
+
+    % Example goal: Prove X wins by occupying the top row.
+    (X1_1 & X1_2 & X1_3) -> X_wins.
+
+end_of_list.
