@@ -5,7 +5,7 @@ This repository contains my implementation of the **Tic-Tac-Toe** game using **P
 
 ## Project Overview
 
-![Tic-Tac-Toe Game Screenshot](tic_tac_toe.png)
+![Tic-Tac-Toe Game Screenshot](tic-tac-toe.png)
 
 **Tic-Tac-Toe** is a two-player game played on a **3x3 grid** where each player takes turns marking their chosen symbol ('X' or 'O'). The game ends when one player aligns three marks in a row, either horizontally, vertically, or diagonally, or when the board is full and no one wins.
 
