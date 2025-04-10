@@ -47,7 +47,7 @@ class TicTacToe:
         
         self.title_label = tk.Label(
             self.title_frame,
-            text="Tic Tac Toe\n(Prover9 Logic)",
+            text="Tic Tac Toe\n",
             font=self.title_font,
             bg="#2c3e50",
             fg="white"
